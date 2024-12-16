@@ -21,6 +21,7 @@
     "@radix-ui/react-separator": "^1.1.1",
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-switch": "^1.1.1",
+    "@radix-ui/react-tabs": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.1.5",
     "@tanstack/react-query": "^5.62.7",
     "@tanstack/react-table": "^8.20.5",
@@ -40,7 +41,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@hookform/devtools": "^4.3.1",
+    "@hookform/devtools": "^4.3.2",
     "@types/node": "^22.5.4",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",

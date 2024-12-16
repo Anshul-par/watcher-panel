@@ -21,7 +21,7 @@ import { ChevronRightIcon } from "@radix-ui/react-icons";
 import useGetProjects from "@/data/query/useGetProjects";
 import { useState } from "react";
 import useGetProjectUrls from "@/data/query/useGetProjectUrls";
-import { Badge } from "./ui/badge";
+import { Link } from "react-router-dom";
 
 export const NavMain = ({
   items,
@@ -77,7 +77,7 @@ export const NavMain = ({
                         {subItem.method}
                       </p>
                       <SidebarMenuSubButton>
-                        {subItem.url.slice(0, 12)}
+                        <Link to={`/url/${subItem._id}`}>{subItem.name}</Link>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   ))}
