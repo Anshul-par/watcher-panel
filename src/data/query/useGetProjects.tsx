@@ -1,13 +1,16 @@
 import customAxios from "@/api";
 import { useQuery } from "@tanstack/react-query";
 
-const KEY = ["projects"];
-const fetchProjects = async () => {
-  const { data } = await customAxios.get("/project");
+const fetchProjects = async ({ queryKey }) => {
+  const [_, id] = queryKey;
+  const { data } = await customAxios.get(
+    id ? `/project?_id=${id}` : "/project"
+  );
   return data;
 };
 
-const useGetProjects = () => {
+const useGetProjects = (id?: string) => {
+  const KEY = id ? ["projects"] : ["projects", id];
   const q = useQuery({
     queryKey: KEY,
     queryFn: fetchProjects,

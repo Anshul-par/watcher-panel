@@ -16,8 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useParams } from "react-router-dom";
-import useGetUrl from "@/data/query/useGetUrl";
+import { useNavigate } from "react-router-dom";
 import { Spinner } from "./ui/spinner";
 import useGetProjects from "@/data/query/useGetProjects";
 import {
@@ -27,9 +26,61 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "./ui/form";
+import { JSONEditorModal } from "./json-preview";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useState } from "react";
+import { useUpdateUrl } from "@/data/mutation/useUpdateUrl";
+import { useDeleteUrl } from "@/data/mutation/useDeleteUrl";
+
+interface DeleteModalProps {
+  isOpen: boolean;
+  setIsOpen: (boolean) => void;
+  onDelete: () => void;
+}
+
+export const DeleteModal = ({
+  isOpen,
+  setIsOpen,
+  onDelete,
+}: DeleteModalProps) => {
+  const handleDelete = () => {
+    onDelete();
+    setIsOpen(false);
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Delete?</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete this? This action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setIsOpen(false)}>
+            Cancel
+          </Button>
+          <Button variant="destructive" onClick={handleDelete}>
+            Delete
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 type FormInputs = {
+  _id: string;
   name: string;
   url: string;
   urlWithIpPort: string;
@@ -37,140 +88,22 @@ type FormInputs = {
   timeout: number;
   method: string;
   project: any;
+  createdAt?: string;
+  updatedAt?: string;
   body?: string;
   headers?: string;
 };
 
-import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
-
-interface EditorProps {
-  value: string;
-  onChange: (value: string) => void;
-}
-
-export function Editor({ value, onChange }: EditorProps) {
-  return (
-    <Textarea
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="min-h-[200px] font-mono text-sm"
-    />
-  );
-}
-
-interface JSONPreviewProps {
-  data: object;
-}
-
-export function JSONPreview({ data }: JSONPreviewProps) {
-  return (
-    <Card>
-      <CardContent className="p-4">
-        <pre className="text-sm overflow-auto max-h-60">
-          {JSON.stringify(data, null, 2)}
-        </pre>
-      </CardContent>
-    </Card>
-  );
-}
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen } from "lucide-react";
-
-interface JSONEditorModalProps {
-  value: string;
-  onChange: (value: string) => void;
-  title: string;
-  disabled?: boolean;
-}
-
-export function JSONEditorModal({
-  value,
-  onChange,
-  title,
-  disabled,
-}: JSONEditorModalProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [localValue, setLocalValue] = useState(value);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSave = () => {
-    try {
-      const parsedValue = JSON.parse(localValue); // Validate JSON
-      onChange(parsedValue); // Only call onChange if JSON is valid
-      setError(null);
-      setIsOpen(false);
-    } catch (err) {
-      setError("Invalid JSON format. Please fix the errors and try again.");
-    }
-  };
-
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" disabled={disabled}>
-          <BookOpen />
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[525px]">
-        <DialogHeader>
-          <DialogTitle>Edit {title}</DialogTitle>
-        </DialogHeader>
-        <Tabs defaultValue="edit" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="edit">Edit</TabsTrigger>
-            <TabsTrigger value="preview">Preview</TabsTrigger>
-          </TabsList>
-          <TabsContent value="edit">
-            <Editor
-              value={localValue}
-              onChange={(newValue) => {
-                setLocalValue(newValue);
-                setError(null); // Clear error when user starts editing
-              }}
-            />
-            {error && <p className="text-red-500 mt-2">{error}</p>}
-          </TabsContent>
-          <TabsContent value="preview">
-            {(() => {
-              try {
-                const parsedData = JSON.parse(localValue);
-                return <JSONPreview data={parsedData} />;
-              } catch {
-                return (
-                  <p className="text-red-500">
-                    Cannot preview. Invalid JSON format.
-                  </p>
-                );
-              }
-            })()}
-          </TabsContent>
-        </Tabs>
-        <div className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={() => setIsOpen(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave}>Save</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-export function UpdateDetailsForm({
+export const UpdateDetailsForm = ({
   initialData,
 }: {
   initialData: FormInputs;
-}) {
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
   const { data: projects, isLoading: projectsLoading } = useGetProjects();
+  const { mutate: deleteMutateUrl } = useDeleteUrl();
+  const { mutate: updateMutateUrl } = useUpdateUrl();
   const form = useForm<FormInputs>({
     values: {
       ...initialData,
@@ -180,12 +113,40 @@ export function UpdateDetailsForm({
     },
   });
 
+  const onDelete = () => {
+    //@ts-ignore
+    deleteMutateUrl(
+      { id: initialData._id },
+      {
+        onSuccess: () => navigate("/"),
+      }
+    );
+  };
+
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      formData.append(key, value.toString());
-    });
-    console.log(formData);
+    delete data.createdAt;
+    delete data.updatedAt;
+
+    //@ts-ignore
+    updateMutateUrl(
+      {
+        id: data._id,
+        updatedData: {
+          ...data,
+          body: JSON.parse(data.body || "{}"),
+          headers: JSON.parse(data.headers || "{}"),
+        },
+      },
+      {
+        onError: (e) =>
+          //@ts-ignore
+          form.setError("formError", {
+            type: "custom",
+            //@ts-ignore
+            message: e.response.data.message,
+          }),
+      }
+    );
   };
 
   if (projectsLoading) {
@@ -194,7 +155,7 @@ export function UpdateDetailsForm({
 
   return (
     <>
-      <Card className="w-full max-w-2xl">
+      <Card className="w-full">
         <CardHeader>
           <CardTitle>URL Details</CardTitle>
           <CardDescription>
@@ -203,7 +164,13 @@ export function UpdateDetailsForm({
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+            <form
+              onSubmit={(e) => {
+                form.clearErrors();
+                form.handleSubmit(onSubmit)(e);
+              }}
+              className="space-y-3"
+            >
               <FormField
                 control={form.control}
                 name="name"
@@ -223,7 +190,7 @@ export function UpdateDetailsForm({
                   <FormItem>
                     <FormLabel>URL</FormLabel>
                     <FormControl>
-                      <Input placeholder="shadcn" {...field} />
+                      <Input placeholder="shadcn" {...field} type="url" />
                     </FormControl>
                   </FormItem>
                 )}
@@ -247,7 +214,7 @@ export function UpdateDetailsForm({
                   <FormItem>
                     <FormLabel>Cron Time (in seconds)</FormLabel>
                     <FormControl>
-                      <Input placeholder="shadcn" {...field} />
+                      <Input placeholder="shadcn" {...field} type="number" />
                     </FormControl>
                   </FormItem>
                 )}
@@ -263,6 +230,7 @@ export function UpdateDetailsForm({
                         placeholder="shadcn"
                         {...field}
                         value={field.value}
+                        type="number"
                       />
                     </FormControl>
                   </FormItem>
@@ -284,6 +252,7 @@ export function UpdateDetailsForm({
                         <SelectItem value="GET">GET</SelectItem>
                         <SelectItem value="POST">POST</SelectItem>
                         <SelectItem value="PUT">PUT</SelectItem>
+                        <SelectItem value="PUT">PATCH</SelectItem>
                         <SelectItem value="DELETE">DELETE</SelectItem>
                       </SelectContent>
                     </Select>
@@ -363,47 +332,37 @@ export function UpdateDetailsForm({
                   </FormItem>
                 )}
               />
+              {form.formState.errors["formError"] && (
+                <FormMessage className="text-[0.8rem] text-red-600 text-center">
+                  Error: {form.formState.errors["formError"].message}
+                </FormMessage>
+              )}
+              <br />
+              <CardFooter className="flex justify-between items-center p-0 mt-8">
+                <Button
+                  type="button"
+                  onClick={() => setIsOpen(true)}
+                  variant={"outline"}
+                  className="min-w-[48%] border-red-500 text-red-500"
+                  disabled={form.formState.isSubmitting}
+                >
+                  Delete
+                </Button>
+                <Button
+                  type="submit"
+                  className="min-w-[48%]"
+                  disabled={form.formState.isSubmitting}
+                >
+                  {form.formState.isSubmitting
+                    ? "Updating..."
+                    : "Update Details"}
+                </Button>
+              </CardFooter>
             </form>
           </Form>
         </CardContent>
-        <CardFooter className="flex justify-between items-center">
-          <Button
-            variant={"outline"}
-            className="min-w-[48%] border-red-500 text-red-500"
-            disabled={form.formState.isSubmitting}
-          >
-            Delete
-          </Button>
-          <Button
-            type="submit"
-            className="min-w-[48%]"
-            disabled={form.formState.isSubmitting}
-          >
-            {form.formState.isSubmitting ? "Updating..." : "Update Details"}
-          </Button>
-        </CardFooter>
       </Card>
+      <DeleteModal isOpen={isOpen} setIsOpen={setIsOpen} onDelete={onDelete} />
     </>
-  );
-}
-
-export const UpdateDetails = () => {
-  const { id } = useParams();
-  const { data, isLoading } = useGetUrl({ urlId: id || "" });
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-96">
-        <Spinner size="sm" className="bg-black dark:bg-white" />
-      </div>
-    );
-  }
-
-  return (
-    <div
-      style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}
-    >
-      <UpdateDetailsForm initialData={data.data[0]} />
-    </div>
   );
 };

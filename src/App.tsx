@@ -1,59 +1,18 @@
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
-import { AppSidebar } from "./components/app-sidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { UpdateDetails, UpdateDetailsForm } from "./components/url-component";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-const Page = () => {
-  return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-        </header>
-        <div className="p-4 pt-0">
-          <Outlet />
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
-  );
-};
+import { UrlDetails } from "./components/url-details";
+import { Layout } from "./components/layout/layout";
+import { AddUrlForm } from "./components/add-url-form";
+import { ProjectForm } from "./components/project-form";
 
 export function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Page />}>
-          <Route path="url/:id" element={<UpdateDetails />} />
+        <Route path="/" element={<Layout />}>
+          <Route path="url/:id" element={<UrlDetails />} />
+          <Route path="add/url" element={<AddUrlForm />} />
+          <Route path="project" element={<ProjectForm />} />
         </Route>
       </Routes>
     </BrowserRouter>
