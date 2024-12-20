@@ -3,9 +3,15 @@ import {
   EllipsisVertical,
   Folder,
   PlusSquare,
-  Sparkle,
+  Trash2,
 } from "lucide-react";
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Collapsible,
   CollapsibleContent,
@@ -33,6 +39,7 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 import { Button } from "./ui/button";
+import { useDeleteProject } from "@/data/mutation/useDeleteProject";
 
 const getColorForHttpMethod = (method) => {
   const methodColors = {
@@ -55,6 +62,12 @@ export const ProjectFolders = () => {
   const { data: urlsUnderProjects } = useGetProjectUrls({
     project: selectedProject,
   });
+  const { mutate: deleteMutateProjetc } = useDeleteProject();
+
+  const onDelete = (id: string) => {
+    //@ts-ignore
+    deleteMutateProjetc({ id });
+  };
 
   return (
     <SidebarGroup>
@@ -68,64 +81,91 @@ export const ProjectFolders = () => {
       </SidebarGroupLabel>
       <SidebarMenu>
         {projects?.data?.map((project) => (
-          <Collapsible
-            key={project._id}
-            asChild
-            open={selectedProject === project._id}
-            onOpenChange={(isOpen) => {
-              if (isOpen) {
-                setSelectedProject(project._id);
-              }
-            }}
-            className="group/collapsible"
-          >
-            <SidebarMenuItem>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={project.name}>
-                  {<Folder />}
-                  <span className="capitalize font-medium">{project.name}</span>
-                  <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
-              {urlsUnderProjects?.data?.map((subItem) => (
-                <CollapsibleContent key={subItem._id}>
-                  <SidebarMenuSub>
-                    <SidebarMenuSubItem
-                      key={subItem._id}
-                      className="flex items-center"
-                    >
-                      <p
-                        className=" font-medium text-xs"
-                        style={{
-                          color: getColorForHttpMethod(subItem.method),
-                        }}
+          <>
+            <Collapsible
+              key={project._id}
+              asChild
+              open={selectedProject === project._id}
+              onOpenChange={() => {
+                setSelectedProject((p) =>
+                  project._id === p ? "" : project._id
+                );
+              }}
+              className="group/collapsible"
+            >
+              <SidebarMenuItem>
+                <div className="flex">
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton tooltip={project.name}>
+                      {<Folder />}
+                      <span className="capitalize font-medium">
+                        {project.name}
+                      </span>
+                      <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger className="flex items-center pr-[7px]">
+                      <EllipsisVertical className="h-4 w-4" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start">
+                      <Link to={`/project?action=UPDATE&id=${project._id}`}>
+                        <DropdownMenuItem>
+                          <Edit2 />
+                          Edit
+                        </DropdownMenuItem>
+                      </Link>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="text-red-500"
+                        onClick={() => onDelete(project._id)}
                       >
-                        {subItem.method}
-                      </p>
+                        <Trash2 />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                {urlsUnderProjects?.data?.map((subItem) => (
+                  <CollapsibleContent key={subItem._id}>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem
+                        key={subItem._id}
+                        className="flex items-center"
+                      >
+                        <p
+                          className=" font-medium text-xs"
+                          style={{
+                            color: getColorForHttpMethod(subItem.method),
+                          }}
+                        >
+                          {subItem.method}
+                        </p>
 
-                      <SidebarMenuSubButton>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <Link
-                                to={`/url/${subItem._id}`}
-                                className="truncate"
-                              >
-                                {subItem.name}
-                              </Link>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{subItem.name}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              ))}
-            </SidebarMenuItem>
-          </Collapsible>
+                        <SidebarMenuSubButton>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Link
+                                  to={`/url/${subItem._id}`}
+                                  className="truncate"
+                                >
+                                  {subItem.name}
+                                </Link>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{subItem.name}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                ))}
+              </SidebarMenuItem>
+            </Collapsible>
+          </>
         ))}
       </SidebarMenu>
     </SidebarGroup>

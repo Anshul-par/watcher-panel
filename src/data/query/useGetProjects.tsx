@@ -10,7 +10,7 @@ const fetchProjects = async ({ queryKey }) => {
 };
 
 const useGetProjects = (id?: string) => {
-  const KEY = id ? ["projects"] : ["projects", id];
+  const KEY = !id ? ["projects"] : ["projects", id];
   const q = useQuery({
     queryKey: KEY,
     queryFn: fetchProjects,

@@ -11,7 +11,7 @@ import {
 import { CardFooter } from "@/components/ui/card";
 import { Spinner } from "./ui/spinner";
 import {
-  Form,
+  Form as UIForm,
   FormControl,
   FormField,
   FormItem,
@@ -37,25 +37,14 @@ type FormInputs = {
   owner: string;
 };
 
-export const ProjectForm = () => {
-  const [searchParams] = useSearchParams();
-
-  const action = (searchParams.get("action") as "ADD" | "UPDATE") || "ADD";
-  const id = searchParams.get("id");
-
+const Form = ({ values, action, id }) => {
   const { data: users, isLoading: usersLoading } = useGetUsers();
-  const { data: projectDetails, isLoading: projectDetailsLoading } =
-    useGetProjects(id ? id : "");
-
   const { mutate: createMutateProject } = useCreateProject();
   const { mutate: updateMutateProject } = useUpdateProject();
 
   const form = useForm<FormInputs>({
     values: {
-      name: action === "UPDATE" ? projectDetails?.data?.[0]?.name : "",
-      description:
-        action === "UPDATE" ? projectDetails?.data?.[0]?.descritpion : "",
-      owner: action === "UPDATE" ? projectDetails?.data?.[0]?.owner : "",
+      ...values,
     },
   });
 
@@ -104,10 +93,6 @@ export const ProjectForm = () => {
     }
   };
 
-  if (projectDetailsLoading) {
-    return <Spinner size="sm" />;
-  }
-
   return (
     <Dialog open={true} onOpenChange={() => navigate(-1)}>
       <DialogContent className="sm:max-w-[400px]">
@@ -119,7 +104,7 @@ export const ProjectForm = () => {
             {`${action == "ADD" ? "Add" : "Update"} the project details.`}
           </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
+        <UIForm {...form}>
           <form
             onSubmit={(e) => {
               form.clearErrors();
@@ -206,12 +191,42 @@ export const ProjectForm = () => {
                 className="min-w-[48%]"
                 disabled={form.formState.isSubmitting}
               >
-                {form.formState.isSubmitting ? "Adding..." : "Add Project"}
+                {form.formState.isSubmitting
+                  ? "Adding..."
+                  : action == "ADD"
+                  ? "Add Project"
+                  : "Update Project"}
               </Button>
             </CardFooter>
           </form>
-        </Form>
+        </UIForm>
       </DialogContent>
     </Dialog>
+  );
+};
+
+export const ProjectForm = () => {
+  const [searchParams] = useSearchParams();
+
+  const action = (searchParams.get("action") as "ADD" | "UPDATE") || "ADD";
+  const id = searchParams.get("id");
+
+  const { data: projectDetails, isLoading: projectDetailsLoading } =
+    useGetProjects(id || "");
+
+  if (projectDetailsLoading) {
+    return <Spinner size={"sm"} className="" />;
+  }
+
+  return (
+    <Form
+      values={{
+        name: projectDetails?.data?.[0]?.name,
+        description: projectDetails?.data?.[0]?.description,
+        owner: projectDetails?.data?.[0]?.owner,
+      }}
+      action={action}
+      id={id}
+    />
   );
 };
