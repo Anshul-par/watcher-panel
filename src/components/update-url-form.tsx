@@ -40,6 +40,7 @@ import {
 import { useState } from "react";
 import { useUpdateUrl } from "@/data/mutation/useUpdateUrl";
 import { useDeleteUrl } from "@/data/mutation/useDeleteUrl";
+import { parseJSON } from "@/helper/parseJSON";
 
 interface DeleteModalProps {
   isOpen: boolean;
@@ -124,17 +125,21 @@ export const UpdateDetailsForm = ({
   };
 
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
-    delete data.createdAt;
-    delete data.updatedAt;
+    const { _id, ...rest } = data;
+
+    delete rest.createdAt;
+    delete rest.updatedAt;
+    //@ts-ignore
+    delete rest.__v;
 
     //@ts-ignore
     updateMutateUrl(
       {
-        id: data._id,
+        id: _id,
         updatedData: {
-          ...data,
-          body: JSON.parse(data.body || "{}"),
-          headers: JSON.parse(data.headers || "{}"),
+          ...rest,
+          body: parseJSON(rest.body),
+          headers: parseJSON(rest.headers),
         },
       },
       {
