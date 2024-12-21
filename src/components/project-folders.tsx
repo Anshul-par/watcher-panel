@@ -74,7 +74,7 @@ export const ProjectFolders = () => {
       <SidebarGroupLabel className="flex items-center justify-between">
         <p className="text-sm">Projects</p>
         <Button variant={"ghost"} className="p-0">
-          <Link to="/project?action=ADD">
+          <Link to="project?action=ADD">
             <PlusSquare />
           </Link>
         </Button>
@@ -109,7 +109,7 @@ export const ProjectFolders = () => {
                       <EllipsisVertical className="h-4 w-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start">
-                      <Link to={`/project?action=UPDATE&id=${project._id}`}>
+                      <Link to={`project?action=UPDATE&id=${project._id}`}>
                         <DropdownMenuItem>
                           <Edit2 />
                           Edit
@@ -147,7 +147,7 @@ export const ProjectFolders = () => {
                             <Tooltip>
                               <TooltipTrigger>
                                 <Link
-                                  to={`/url/${subItem._id}`}
+                                  to={`url/${subItem._id}`}
                                   className="truncate"
                                 >
                                   {subItem.name}

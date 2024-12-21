@@ -3,10 +3,22 @@ import useGetUrl from "@/data/query/useGetUrl";
 import { Spinner } from "./ui/spinner";
 import { UptimePanel } from "./uptime-panel";
 import { UpdateDetailsForm } from "./update-url-form";
+import ErrorPage from "./layout/errorpage";
 
 export const UrlDetails = () => {
   const { id } = useParams();
-  const { data, isLoading } = useGetUrl({ urlId: id || "" });
+  const { data, isLoading, isError, error } = useGetUrl({ urlId: id || "" });
+
+  console.log({
+    data,
+    isLoading,
+    isError,
+    error,
+  });
+
+  if (isError) {
+    return <ErrorPage error={error} />;
+  }
 
   if (isLoading) {
     return (

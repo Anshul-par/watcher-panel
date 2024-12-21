@@ -24,6 +24,7 @@ type FormInputs = {
   name: string;
   slackUserId: string;
   title: string;
+  password: string;
 };
 
 type UserFormProps = {
@@ -44,11 +45,14 @@ export const UserForm = ({
   const { mutate: createMutateUser } = useCreateUser();
   const { mutate: updateMutateUser } = useUpdateUser();
 
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
   const form = useForm<FormInputs>({
     values: {
       name: values?.name || "",
       slackUserId: values?.slackUserId || "",
       title: values?.title || "",
+      password: values?.password || "",
     },
   });
 
@@ -110,8 +114,6 @@ export const UserForm = ({
           ...prevState,
           isOpen: !prevState.isOpen,
         }));
-
-        // setTimeout(() => (document.body.style.pointerEvents = ""), 100);
       }}
     >
       <DialogContent className="sm:max-w-[400px]">
@@ -155,6 +157,20 @@ export const UserForm = ({
                 </FormItem>
               )}
             />
+            {user.name === values?.name && (
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input placeholder="" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            )}
             <FormField
               control={form.control}
               name="title"

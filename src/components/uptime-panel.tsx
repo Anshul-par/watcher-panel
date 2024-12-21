@@ -62,6 +62,7 @@ export const UptimePanel = () => {
         isLoading: true,
         json: { message: "Loading..." },
       }));
+      console.log(urlData.data[0]);
       const JSON = await makeAPIRequest({
         url: urlData.data[0].url,
         method: urlData.data[0].method,

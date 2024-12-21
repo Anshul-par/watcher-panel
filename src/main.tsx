@@ -28,15 +28,6 @@ const queryClient = new QueryClient({
 
         return true;
       },
-      throwOnError: (error) => {
-        const STATUS_ON_NOT_TO_THROW = [401];
-
-        //@ts-ignore
-        if (STATUS_ON_NOT_TO_THROW.includes(error.response?.status))
-          return false;
-
-        return true;
-      },
     },
   },
 });

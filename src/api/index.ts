@@ -5,7 +5,7 @@ const BASE_URL = "http://172.168.16.12:5000";
 const customAxios = axios.create({
   baseURL: BASE_URL,
   timeout: 50000,
-  headers: { Authorization: "" },
+  headers: { Authorization: localStorage.getItem("token") || "" },
 });
 
 export default customAxios;

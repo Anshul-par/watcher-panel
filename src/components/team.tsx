@@ -29,6 +29,7 @@ import { Button } from "./ui/button";
 import { UserForm } from "./user-form";
 import { useState } from "react";
 import { useDeleteUser } from "@/data/mutation/useDeleteUser";
+import { Link } from "react-router-dom";
 
 const queryConfig = {
   queryKey: ["users"],
@@ -72,11 +73,13 @@ export const TeamSwitcher = () => {
                 size="lg"
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <TowerControl className="size-4" />
+                <div className="flex aspect-square size-10 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <TowerControl className="size-5" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Watcher</span>
+                  <span className="truncate font-semibold text-md">
+                    Watcher
+                  </span>
                   <span className="truncate text-xs">
                     URLs are Online or Not
                   </span>
@@ -111,7 +114,7 @@ export const TeamSwitcher = () => {
                           <WandSparkles className="size-4 shrink-0" />
                         )}
                       </div>
-                      <p>{team.name}</p>
+                      <p className="capitalize">{team.name}</p>
                       {team.title && (
                         <p className="font-semibold">({team.title})</p>
                       )}
@@ -151,15 +154,14 @@ export const TeamSwitcher = () => {
               )}
               <DropdownMenuSeparator />
               <DropdownMenuItem className="gap-2 p-2">
-                <div className="flex size-6 items-center justify-center rounded-md border bg-background">
-                  <Plus className="size-4" />
-                </div>
-                <div
-                  className="font-medium text-muted-foreground"
-                  onClick={() => setModalState({ ...modalState, isOpen: true })}
-                >
-                  Add User
-                </div>
+                <Link to="/register" className="flex items-center gap-2">
+                  <div className="flex size-6 items-center justify-center rounded-md border bg-background">
+                    <Plus className="size-4" />
+                  </div>
+                  <div className="font-medium text-muted-foreground">
+                    Add User
+                  </div>
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
