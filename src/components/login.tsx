@@ -1,8 +1,8 @@
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { useForm, SubmitHandler } from "react-hook-form"
 import {
   Form,
   FormControl,
@@ -10,56 +10,56 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form";
-import { Eye, EyeOff, TowerControl } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import customAxios from "@/api";
-import { useEffect, useState } from "react";
+} from "./ui/form"
+import { Eye, EyeOff, TowerControl } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import { toast } from "sonner"
+import customAxios from "@/api"
+import { useEffect, useState } from "react"
 
 type FormInputs = {
-  name: string;
-  password: string;
-};
+  name: string
+  password: string
+}
 const LoginForm = ({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"form">) => {
-  const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate()
+  const [showPassword, setShowPassword] = useState(false)
   const form = useForm<FormInputs>({
     values: {
       name: "",
       password: "",
     },
-  });
+  })
 
   const onSubmit: SubmitHandler<FormInputs> = async (values) => {
     try {
-      const { data } = await customAxios.post("/auth/login", values);
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      const { data } = await customAxios.post("/auth/login", values)
+      localStorage.setItem("token", data.token)
+      localStorage.setItem("user", JSON.stringify(data.user))
       toast("Login Successful", {
         description: `${new Intl.DateTimeFormat("en-GB", {
           dateStyle: "full",
           timeStyle: "long",
           timeZone: "Asia/Kolkata",
         }).format(Date.now())}`,
-      });
-      navigate("/app");
+      })
+      navigate("/app")
     } catch (error) {
       //@ts-ignore
       form.setError("formError", {
         type: "custom",
         //@ts-ignore
         message: error.response?.data?.message || "An error occurred",
-      });
+      })
     }
-  };
+  }
 
   const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+    setShowPassword(!showPassword)
+  }
 
   return (
     <Form {...form}>
@@ -67,8 +67,8 @@ const LoginForm = ({
         className={cn("flex flex-col gap-6 space-y-3", className)}
         {...props}
         onSubmit={(e) => {
-          form.clearErrors();
-          form.handleSubmit(onSubmit)(e);
+          form.clearErrors()
+          form.handleSubmit(onSubmit)(e)
         }}
       >
         <div className="flex flex-col items-center gap-2 text-center">
@@ -142,24 +142,24 @@ const LoginForm = ({
         </div>
       </form>
     </Form>
-  );
-};
+  )
+}
 
 export const LoginPage = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   useEffect(() => {
     const validateToken = async () => {
       try {
-        await customAxios.get("/auth/validate");
-        navigate("/app");
+        await customAxios.get("/auth/validate")
+        navigate("/app")
       } catch (error) {
-        console.error("Token is invalid", error);
+        console.error("Token is invalid", error)
       }
-    };
+    }
 
-    validateToken();
-  }, []);
+    validateToken()
+  }, [])
 
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
@@ -178,7 +178,7 @@ export const LoginPage = () => {
           </div>
         </div>
       </div>
-      <div className="relative  bg-muted lg:block">
+      <div className="relative bg-muted lg:block sm:hidden">
         <img
           src="https://res.cloudinary.com/dmi8xdkrq/image/upload/v1734767446/DALL_E_2024-12-21_13.20.12_-_A_black-and-white_artistic_view_from_the_top_of_a_lighthouse_overlooking_a_dramatic_coastline_with_rocky_cliffs_and_rolling_waves._The_scene_includes_unlrwl.webp"
           alt="Image"
@@ -186,5 +186,5 @@ export const LoginPage = () => {
         />
       </div>
     </div>
-  );
-};
+  )
+}

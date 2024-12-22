@@ -1,11 +1,11 @@
-import axios from "axios";
+import axios from "axios"
 
-const BASE_URL = "http://172.168.16.12:5000";
+const BASE_URL = "http://localhost:5001"
 
 const customAxios = axios.create({
   baseURL: BASE_URL,
   timeout: 50000,
   headers: { Authorization: localStorage.getItem("token") || "" },
-});
+})
 
-export default customAxios;
+export default customAxios

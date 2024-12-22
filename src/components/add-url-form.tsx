@@ -1,16 +1,16 @@
-import { useForm, SubmitHandler } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useForm, SubmitHandler } from "react-hook-form"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { CardFooter } from "@/components/ui/card";
-import { Spinner } from "./ui/spinner";
-import useGetProjects from "@/data/query/useGetProjects";
+} from "@/components/ui/select"
+import { CardFooter } from "@/components/ui/card"
+import { Spinner } from "./ui/spinner"
+import useGetProjects from "@/data/query/useGetProjects"
 import {
   Form,
   FormControl,
@@ -19,38 +19,38 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form";
-import { JSONEditorModal } from "./json-preview";
+} from "./ui/form"
+import { JSONEditorModal } from "./json-preview"
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { useCreateUrl } from "@/data/mutation/useCreateUrl";
-import { useNavigate } from "react-router-dom";
+} from "@/components/ui/dialog"
+import { useCreateUrl } from "@/data/mutation/useCreateUrl"
+import { useNavigate } from "react-router-dom"
 
 type FormInputs = {
-  _id: string;
-  name: string;
-  url: string;
-  urlWithIpPort: string;
-  cronSchedule: number;
-  timeout: number;
-  method: string;
-  project: any;
-  createdAt?: string;
-  updatedAt?: string;
-  body?: string;
-  headers?: string;
-};
+  _id: string
+  name: string
+  url: string
+  urlWithIpPort: string
+  cronSchedule: number
+  timeout: number
+  method: string
+  project: any
+  createdAt?: string
+  updatedAt?: string
+  body?: string
+  headers?: string
+}
 
 export const AddUrlForm = () => {
-  const { data: projects, isLoading: projectsLoading } = useGetProjects();
-  const { mutate: createMutateUrl } = useCreateUrl();
-  const form = useForm<FormInputs>();
-  const navigate = useNavigate();
+  const { data: projects, isLoading: projectsLoading } = useGetProjects()
+  const { mutate: createMutateUrl } = useCreateUrl()
+  const form = useForm<FormInputs>()
+  const navigate = useNavigate()
 
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
     //@ts-ignore
@@ -69,22 +69,22 @@ export const AddUrlForm = () => {
             type: "custom",
             //@ts-ignore
             message: e.response.data.message,
-          });
+          })
         },
         onSuccess: () => {
-          navigate(-1);
+          navigate(-1)
         },
       }
-    );
-  };
+    )
+  }
 
   if (projectsLoading) {
-    return <Spinner size="sm" />;
+    return <Spinner size="sm" />
   }
 
   return (
     <Dialog open={true} onOpenChange={() => navigate(-1)}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] md:max-h-[600px] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add URL Details</DialogTitle>
           <DialogDescription>
@@ -94,8 +94,8 @@ export const AddUrlForm = () => {
         <Form {...form}>
           <form
             onSubmit={(e) => {
-              form.clearErrors();
-              form.handleSubmit(onSubmit)(e);
+              form.clearErrors()
+              form.handleSubmit(onSubmit)(e)
             }}
             className="space-y-3"
           >
@@ -287,5 +287,5 @@ export const AddUrlForm = () => {
         </Form>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
