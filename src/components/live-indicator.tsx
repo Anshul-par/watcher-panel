@@ -1,19 +1,25 @@
-import { cn } from "@/lib/utils"
-import { Badge } from "./ui/badge"
+import { cn } from "@/lib/utils";
+import { Badge } from "./ui/badge";
 
 interface LiveIndicatorButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  text?: string
-  isLive?: boolean
+  text?: string;
+  isLive?: boolean;
+  onClick?: () => void;
 }
 
 export const LiveIndicatorButton: React.FC<LiveIndicatorButtonProps> = ({
   text = "Live",
   isLive = true,
   className,
+  onClick,
 }) => {
   return (
-    <Badge variant="secondary" className={cn("gap-2", className)}>
+    <Badge
+      variant="secondary"
+      onClick={onClick}
+      className={cn("gap-2 cursor-pointer", className)}
+    >
       <span
         className={cn(
           "h-2 w-2 rounded-full",
@@ -22,5 +28,5 @@ export const LiveIndicatorButton: React.FC<LiveIndicatorButtonProps> = ({
       />
       {text}
     </Badge>
-  )
-}
+  );
+};

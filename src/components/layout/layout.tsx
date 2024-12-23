@@ -1,14 +1,14 @@
-import { Navigate, Outlet } from "react-router-dom"
+import { Navigate, Outlet } from "react-router-dom";
 
-import { Separator } from "@/components/ui/separator"
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
-import { AppSidebar } from "../app-sidebar"
+import { Separator } from "@/components/ui/separator";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "../app-sidebar";
 
 export const Layout = () => {
-  const token = localStorage.getItem("token")
+  const token = localStorage.getItem("token");
 
   if (!token) {
-    return <Navigate to="/" />
+    return <Navigate to="/" />;
   }
 
   return (
@@ -25,5 +25,5 @@ export const Layout = () => {
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
-}
+  );
+};

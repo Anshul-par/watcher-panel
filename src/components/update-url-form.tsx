@@ -1,13 +1,13 @@
-import { useForm, SubmitHandler } from "react-hook-form"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { useForm, SubmitHandler } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   Card,
   CardContent,
@@ -15,10 +15,10 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { useNavigate } from "react-router-dom"
-import { Spinner } from "./ui/spinner"
-import useGetProjects from "@/data/query/useGetProjects"
+} from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
+import { Spinner } from "./ui/spinner";
+import useGetProjects from "@/data/query/useGetProjects";
 import {
   Form,
   FormControl,
@@ -27,8 +27,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form"
-import { JSONEditorModal } from "./json-preview"
+} from "./ui/form";
+import { JSONEditorModal } from "./json-preview";
 import {
   Dialog,
   DialogContent,
@@ -36,16 +36,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { useState } from "react"
-import { useUpdateUrl } from "@/data/mutation/useUpdateUrl"
-import { useDeleteUrl } from "@/data/mutation/useDeleteUrl"
-import { parseJSON } from "@/helper/parseJSON"
+} from "@/components/ui/dialog";
+import { useState } from "react";
+import { useUpdateUrl } from "@/data/mutation/useUpdateUrl";
+import { useDeleteUrl } from "@/data/mutation/useDeleteUrl";
+import { parseJSON } from "@/helper/parseJSON";
+import { ErrorMessage } from "./layout/errormessage";
 
 interface DeleteModalProps {
-  isOpen: boolean
-  setIsOpen: (boolean) => void
-  onDelete: () => void
+  isOpen: boolean;
+  setIsOpen: (boolean) => void;
+  onDelete: () => void;
 }
 
 export const DeleteModal = ({
@@ -54,9 +55,9 @@ export const DeleteModal = ({
   onDelete,
 }: DeleteModalProps) => {
   const handleDelete = () => {
-    onDelete()
-    setIsOpen(false)
-  }
+    onDelete();
+    setIsOpen(false);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -77,34 +78,38 @@ export const DeleteModal = ({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
 type FormInputs = {
-  _id: string
-  name: string
-  url: string
-  urlWithIpPort: string
-  cronSchedule: number
-  timeout: number
-  method: string
-  project: any
-  createdAt?: string
-  updatedAt?: string
-  body?: string
-  headers?: string
-}
+  _id: string;
+  name: string;
+  url: string;
+  urlWithIpPort: string;
+  cronSchedule: number;
+  timeout: number;
+  method: string;
+  project: any;
+  createdAt?: string;
+  updatedAt?: string;
+  body?: string;
+  headers?: string;
+};
 
 export const UpdateDetailsForm = ({
   initialData,
 }: {
-  initialData: FormInputs
+  initialData: FormInputs;
 }) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const navigate = useNavigate()
-  const { data: projects, isLoading: projectsLoading } = useGetProjects()
-  const { mutate: deleteMutateUrl } = useDeleteUrl()
-  const { mutate: updateMutateUrl } = useUpdateUrl()
+  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const {
+    data: projects,
+    isLoading: projectsLoading,
+    isError: projectsError,
+  } = useGetProjects();
+  const { mutate: deleteMutateUrl } = useDeleteUrl();
+  const { mutate: updateMutateUrl } = useUpdateUrl();
   const form = useForm<FormInputs>({
     values: {
       ...initialData,
@@ -112,7 +117,7 @@ export const UpdateDetailsForm = ({
       body: JSON.stringify(initialData.body || {}, null, 2),
       headers: JSON.stringify(initialData.headers || {}, null, 2),
     },
-  })
+  });
 
   const onDelete = () => {
     //@ts-ignore
@@ -121,16 +126,16 @@ export const UpdateDetailsForm = ({
       {
         onSuccess: () => navigate("/"),
       }
-    )
-  }
+    );
+  };
 
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
-    const { _id, ...rest } = data
+    const { _id, ...rest } = data;
 
-    delete rest.createdAt
-    delete rest.updatedAt
+    delete rest.createdAt;
+    delete rest.updatedAt;
     //@ts-ignore
-    delete rest.__v
+    delete rest.__v;
 
     //@ts-ignore
     updateMutateUrl(
@@ -151,30 +156,60 @@ export const UpdateDetailsForm = ({
             message: e.response.data.message,
           }),
       }
-    )
+    );
+  };
+
+  let projectsListJSX = <></>;
+
+  if (projectsError) {
+    projectsListJSX = (
+      <div className="text-center text-red-500 text-sm">
+        <ErrorMessage />
+      </div>
+    );
   }
 
   if (projectsLoading) {
-    return <Spinner size="sm" />
+    projectsListJSX = (
+      <div className="flex justify-center items-center h-96">
+        <Spinner size="sm" className="bg-black" />
+      </div>
+    );
+  }
+
+  if (projects?.data) {
+    projectsListJSX = (
+      <SelectContent>
+        {projects.data.map((project) => (
+          <SelectItem
+            key={project._id}
+            value={project._id}
+            className="capitalize"
+          >
+            {project.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    );
   }
 
   return (
     <>
-      <Card className="w-full">
+      <Card className="w-full h-screen overflow-y-auto">
         <CardHeader>
           <CardTitle>URL Details</CardTitle>
           <CardDescription>
             Update the details for {initialData.name}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="h-full">
           <Form {...form}>
             <form
               onSubmit={(e) => {
-                form.clearErrors()
-                form.handleSubmit(onSubmit)(e)
+                form.clearErrors();
+                form.handleSubmit(onSubmit)(e);
               }}
-              className="space-y-3"
+              className="flex flex-col justify-between h-full"
             >
               <FormField
                 control={form.control}
@@ -277,19 +312,7 @@ export const UpdateDetailsForm = ({
                           className="capitalize"
                         />
                       </SelectTrigger>
-                      {
-                        <SelectContent>
-                          {projects?.data?.map((project) => (
-                            <SelectItem
-                              key={project._id}
-                              value={project._id}
-                              className="capitalize"
-                            >
-                              {project.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      }
+                      {projectsListJSX}
                     </Select>
                   </FormItem>
                 )}
@@ -337,13 +360,14 @@ export const UpdateDetailsForm = ({
                   </FormItem>
                 )}
               />
+
               {form.formState.errors["formError"] && (
                 <FormMessage className="text-[0.8rem] text-red-600 text-center">
                   Error: {form.formState.errors["formError"].message}
                 </FormMessage>
               )}
-              <br />
-              <CardFooter className="flex justify-between items-center p-0 mt-8">
+
+              <CardFooter className="flex justify-between items-center p-0">
                 <Button
                   type="button"
                   onClick={() => setIsOpen(true)}
@@ -369,5 +393,5 @@ export const UpdateDetailsForm = ({
       </Card>
       <DeleteModal isOpen={isOpen} setIsOpen={setIsOpen} onDelete={onDelete} />
     </>
-  )
-}
+  );
+};

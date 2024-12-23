@@ -19,8 +19,6 @@ const fetchProjectUrls = async ({ queryKey }) => {
     }
 
     aggregatedData = data.data.reduce((accumulatedData, currentItem) => {
-      console.log(accumulatedData, currentItem, "accumulatedData, currentItem"); // For debugging
-
       // Accumulate retries, timeouts, and cron runs
       accumulatedData["numberOfRetries"] =
         (accumulatedData["numberOfRetries"] || 0) +
