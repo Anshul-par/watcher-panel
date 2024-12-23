@@ -71,7 +71,6 @@ export const ProjectFolders = () => {
   } = useGetProjects();
   const {
     data: urlsUnderProjects,
-    isLoading: urlsLoading,
     isError: isUrlsError,
     error: urlsError,
   } = useGetProjectUrls({
@@ -179,10 +178,6 @@ export const ProjectFolders = () => {
                     <ErrorMessage
                       message={(urlsError as any)?.response?.data?.message}
                     />
-                  ) : urlsLoading ? (
-                    <div className="flex justify-center items-center">
-                      <Spinner size={"sm"} className="bg-black" />
-                    </div>
                   ) : (
                     urlsUnderProjects?.data?.map((subItem) => (
                       <CollapsibleContent
