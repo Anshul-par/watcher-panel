@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = import.meta.env.VITE_API_URL as string;
+const BASE_URL = "http://116.72.16.128:3217"
 
 const customAxios = axios.create({
   baseURL: BASE_URL,
