@@ -41,6 +41,7 @@ import { useState } from "react";
 import { useUpdateUrl } from "@/data/mutation/useUpdateUrl";
 import { useDeleteUrl } from "@/data/mutation/useDeleteUrl";
 import { parseJSON } from "@/helper/parseJSON";
+import { ErrorMessage } from "./layout/errormessage";
 
 interface DeleteModalProps {
   isOpen: boolean;
@@ -102,7 +103,11 @@ export const UpdateDetailsForm = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-  const { data: projects, isLoading: projectsLoading } = useGetProjects();
+  const {
+    data: projects,
+    isLoading: projectsLoading,
+    isError: projectsError,
+  } = useGetProjects();
   const { mutate: deleteMutateUrl } = useDeleteUrl();
   const { mutate: updateMutateUrl } = useUpdateUrl();
   const form = useForm<FormInputs>({
@@ -154,27 +159,57 @@ export const UpdateDetailsForm = ({
     );
   };
 
+  let projectsListJSX = <></>;
+
+  if (projectsError) {
+    projectsListJSX = (
+      <div className="text-center text-red-500 text-sm">
+        <ErrorMessage />
+      </div>
+    );
+  }
+
   if (projectsLoading) {
-    return <Spinner size="sm" />;
+    projectsListJSX = (
+      <div className="flex justify-center items-center h-96">
+        <Spinner size="sm" className="bg-black" />
+      </div>
+    );
+  }
+
+  if (projects?.data) {
+    projectsListJSX = (
+      <SelectContent>
+        {projects.data.map((project) => (
+          <SelectItem
+            key={project._id}
+            value={project._id}
+            className="capitalize"
+          >
+            {project.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    );
   }
 
   return (
     <>
-      <Card className="w-full">
+      <Card className="w-full h-screen overflow-y-auto">
         <CardHeader>
           <CardTitle>URL Details</CardTitle>
           <CardDescription>
             Update the details for {initialData.name}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="h-full">
           <Form {...form}>
             <form
               onSubmit={(e) => {
                 form.clearErrors();
                 form.handleSubmit(onSubmit)(e);
               }}
-              className="space-y-3"
+              className="flex flex-col justify-between h-full"
             >
               <FormField
                 control={form.control}
@@ -277,19 +312,7 @@ export const UpdateDetailsForm = ({
                           className="capitalize"
                         />
                       </SelectTrigger>
-                      {
-                        <SelectContent>
-                          {projects?.data?.map((project) => (
-                            <SelectItem
-                              key={project._id}
-                              value={project._id}
-                              className="capitalize"
-                            >
-                              {project.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      }
+                      {projectsListJSX}
                     </Select>
                   </FormItem>
                 )}
@@ -337,13 +360,14 @@ export const UpdateDetailsForm = ({
                   </FormItem>
                 )}
               />
+
               {form.formState.errors["formError"] && (
                 <FormMessage className="text-[0.8rem] text-red-600 text-center">
                   Error: {form.formState.errors["formError"].message}
                 </FormMessage>
               )}
-              <br />
-              <CardFooter className="flex justify-between items-center p-0 mt-8">
+
+              <CardFooter className="flex justify-between items-center p-0">
                 <Button
                   type="button"
                   onClick={() => setIsOpen(true)}

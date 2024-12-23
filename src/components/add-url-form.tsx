@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/dialog";
 import { useCreateUrl } from "@/data/mutation/useCreateUrl";
 import { useNavigate } from "react-router-dom";
+import { ErrorMessage } from "./layout/errormessage";
 
 type FormInputs = {
   _id: string;
@@ -47,7 +48,7 @@ type FormInputs = {
 };
 
 export const AddUrlForm = () => {
-  const { data: projects, isLoading: projectsLoading } = useGetProjects();
+  const { data: projects, isLoading, isError, error } = useGetProjects();
   const { mutate: createMutateUrl } = useCreateUrl();
   const form = useForm<FormInputs>();
   const navigate = useNavigate();
@@ -78,13 +79,43 @@ export const AddUrlForm = () => {
     );
   };
 
-  if (projectsLoading) {
-    return <Spinner size="sm" />;
+  let projectsListJSX = <></>;
+
+  if (isError) {
+    projectsListJSX = (
+      <div className="text-center text-red-500 text-sm">
+        <ErrorMessage message={(error as any)?.response?.data?.message} />
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    projectsListJSX = (
+      <div className="flex justify-center items-center h-96">
+        <Spinner size="sm" className="bg-black" />
+      </div>
+    );
+  }
+
+  if (projects?.data) {
+    projectsListJSX = (
+      <SelectContent>
+        {projects.data.map((project) => (
+          <SelectItem
+            key={project._id}
+            value={project._id}
+            className="capitalize"
+          >
+            {project.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    );
   }
 
   return (
     <Dialog open={true} onOpenChange={() => navigate(-1)}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] sm:overflow-y-auto max-w-full">
         <DialogHeader>
           <DialogTitle>Add URL Details</DialogTitle>
           <DialogDescription>
@@ -199,19 +230,7 @@ export const AddUrlForm = () => {
                         className="capitalize"
                       />
                     </SelectTrigger>
-                    {
-                      <SelectContent>
-                        {projects?.data?.map((project) => (
-                          <SelectItem
-                            key={project._id}
-                            value={project._id}
-                            className="capitalize"
-                          >
-                            {project.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    }
+                    {projectsListJSX}
                   </Select>
                 </FormItem>
               )}
@@ -230,7 +249,6 @@ export const AddUrlForm = () => {
                   <FormControl>
                     <JSONEditorModal
                       value={field.value || ""}
-                      disabled={form.getValues("method") === "GET"}
                       onChange={field.onChange}
                       title="Body"
                     />

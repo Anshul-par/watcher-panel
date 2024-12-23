@@ -1,23 +1,16 @@
 import { useParams } from "react-router-dom";
-import useGetUrl from "@/data/query/useGetUrl";
 import { Spinner } from "./ui/spinner";
-import { UptimePanel } from "./uptime-panel";
 import { UpdateDetailsForm } from "./update-url-form";
-import ErrorPage from "./layout/errorpage";
+import { UptimeDashboard } from "./updated-uptime";
+import useGetUrl from "@/data/query/useGetUrl";
+import { ErrorMessage } from "./layout/errormessage";
 
 export const UrlDetails = () => {
   const { id } = useParams();
   const { data, isLoading, isError, error } = useGetUrl({ urlId: id || "" });
 
-  console.log({
-    data,
-    isLoading,
-    isError,
-    error,
-  });
-
   if (isError) {
-    return <ErrorPage error={error} />;
+    return <ErrorMessage message={(error as any)?.response?.data?.message} />;
   }
 
   if (isLoading) {
@@ -30,10 +23,18 @@ export const UrlDetails = () => {
 
   return (
     <div
-      style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: "1rem",
+      }}
     >
-      <UpdateDetailsForm initialData={data.data[0]} />
-      <UptimePanel />
+      {Object.keys(data?.data?.[0] || {}).length ? (
+        <UpdateDetailsForm initialData={data.data[0]} />
+      ) : (
+        <ErrorMessage />
+      )}
+      <UptimeDashboard />
     </div>
   );
 };

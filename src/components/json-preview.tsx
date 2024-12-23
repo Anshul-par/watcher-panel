@@ -1,20 +1,20 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Textarea } from "@/components/ui/textarea"
+import { useState } from "react"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen } from "lucide-react";
+} from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { BookOpen } from "lucide-react"
 
 interface EditorProps {
-  value: string;
-  onChange: (value: string) => void;
+  value: string
+  onChange: (value: string) => void
 }
 
 export function Editor({ value, onChange }: EditorProps) {
@@ -24,30 +24,30 @@ export function Editor({ value, onChange }: EditorProps) {
       onChange={(e) => onChange(e.target.value)}
       className="min-h-[200px] font-mono text-sm"
     />
-  );
+  )
 }
 
 interface JSONPreviewProps {
-  data: object;
+  data: object
 }
 
 export function JSONPreview({ data }: JSONPreviewProps) {
   return (
     <Card>
-      <CardContent className="p-4 max-h-[300px] max-w-[600px] overflow-auto">
-        <pre className="text-sm text-gray-600 dark:text-gray-400">
+      <CardContent className="p-4">
+        <pre className="text-sm w-full max-h-[300px] overflow-auto text-gray-600 dark:text-gray-400 break-all whitespace-pre-wrap">
           {JSON.stringify(data, null, 2)}
         </pre>
       </CardContent>
     </Card>
-  );
+  )
 }
 
 interface JSONEditorModalProps {
-  value: string;
-  onChange: (value: string) => void;
-  title: string;
-  disabled?: boolean;
+  value: string
+  onChange: (value: string) => void
+  title: string
+  disabled?: boolean
 }
 
 export function JSONEditorModal({
@@ -56,20 +56,20 @@ export function JSONEditorModal({
   title,
   disabled,
 }: JSONEditorModalProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [localValue, setLocalValue] = useState(value);
-  const [error, setError] = useState<string | null>(null);
+  const [isOpen, setIsOpen] = useState(false)
+  const [localValue, setLocalValue] = useState(value)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSave = () => {
     try {
-      const parsedValue = JSON.parse(localValue); // Validate JSON
-      onChange(parsedValue); // Only call onChange if JSON is valid
-      setError(null);
-      setIsOpen(false);
+      const parsedValue = JSON.parse(localValue) // Validate JSON
+      onChange(parsedValue) // Only call onChange if JSON is valid
+      setError(null)
+      setIsOpen(false)
     } catch (err) {
-      setError("Invalid JSON format. Please fix the errors and try again.");
+      setError("Invalid JSON format. Please fix the errors and try again.")
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -78,7 +78,7 @@ export function JSONEditorModal({
           <BookOpen />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[525px]">
+      <DialogContent className="max-w-[525px]">
         <DialogHeader>
           <DialogTitle>Edit {title}</DialogTitle>
         </DialogHeader>
@@ -91,8 +91,8 @@ export function JSONEditorModal({
             <Editor
               value={localValue}
               onChange={(newValue) => {
-                setLocalValue(newValue);
-                setError(null); // Clear error when user starts editing
+                setLocalValue(newValue)
+                setError(null) // Clear error when user starts editing
               }}
             />
             {error && <p className="text-red-500 mt-2">{error}</p>}
@@ -100,14 +100,14 @@ export function JSONEditorModal({
           <TabsContent value="preview">
             {(() => {
               try {
-                const parsedData = JSON.parse(localValue);
-                return <JSONPreview data={parsedData} />;
+                const parsedData = JSON.parse(localValue)
+                return <JSONPreview data={parsedData} />
               } catch {
                 return (
                   <p className="text-red-500 font-medium text-center py-2">
                     Cannot preview. Invalid JSON format.
                   </p>
-                );
+                )
               }
             })()}
           </TabsContent>
@@ -120,5 +120,5 @@ export function JSONEditorModal({
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

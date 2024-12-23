@@ -4,19 +4,19 @@ import {
   Folder,
   PlusSquare,
   Trash2,
-} from "lucide-react";
+} from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu"
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+} from "@/components/ui/collapsible"
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -26,20 +26,20 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar";
-import { ChevronRightIcon } from "@radix-ui/react-icons";
-import useGetProjects from "@/data/query/useGetProjects";
-import { useState } from "react";
-import useGetProjectUrls from "@/data/query/useGetProjectUrls";
-import { Link } from "react-router-dom";
+} from "@/components/ui/sidebar"
+import { ChevronRightIcon } from "@radix-ui/react-icons"
+import useGetProjects from "@/data/query/useGetProjects"
+import { useState } from "react"
+import useGetProjectUrls from "@/data/query/useGetProjectUrls"
+import { Link } from "react-router-dom"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "./ui/tooltip";
-import { Button } from "./ui/button";
-import { useDeleteProject } from "@/data/mutation/useDeleteProject";
+} from "./ui/tooltip"
+import { Button } from "./ui/button"
+import { useDeleteProject } from "@/data/mutation/useDeleteProject"
 
 const getColorForHttpMethod = (method) => {
   const methodColors = {
@@ -50,24 +50,24 @@ const getColorForHttpMethod = (method) => {
     PATCH: "#17a2b8", // Teal for PATCH requests
     OPTIONS: "#6c757d", // Gray for OPTIONS requests
     HEAD: "#343a40", // Dark gray for HEAD requests
-  };
+  }
 
   // Return the color for the method, or a default color if not found
-  return methodColors[method.toUpperCase()] || "#6c757d"; // Default: gray
-};
+  return methodColors[method.toUpperCase()] || "#6c757d" // Default: gray
+}
 
 export const ProjectFolders = () => {
-  const [selectedProject, setSelectedProject] = useState("");
-  const { data: projects } = useGetProjects();
+  const [selectedProject, setSelectedProject] = useState("")
+  const { data: projects } = useGetProjects()
   const { data: urlsUnderProjects } = useGetProjectUrls({
     project: selectedProject,
-  });
-  const { mutate: deleteMutateProjetc } = useDeleteProject();
+  })
+  const { mutate: deleteMutateProjetc } = useDeleteProject()
 
   const onDelete = (id: string) => {
     //@ts-ignore
-    deleteMutateProjetc({ id });
-  };
+    deleteMutateProjetc({ id })
+  }
 
   return (
     <SidebarGroup>
@@ -89,7 +89,7 @@ export const ProjectFolders = () => {
               onOpenChange={() => {
                 setSelectedProject((p) =>
                   project._id === p ? "" : project._id
-                );
+                )
               }}
               className="group/collapsible"
             >
@@ -127,7 +127,10 @@ export const ProjectFolders = () => {
                   </DropdownMenu>
                 </div>
                 {urlsUnderProjects?.data?.map((subItem) => (
-                  <CollapsibleContent key={subItem._id}>
+                  <CollapsibleContent
+                    key={subItem._id}
+                    className="overflow-hidden transition-all duration-300 ease-in-out"
+                  >
                     <SidebarMenuSub>
                       <SidebarMenuSubItem
                         key={subItem._id}
@@ -169,5 +172,5 @@ export const ProjectFolders = () => {
         ))}
       </SidebarMenu>
     </SidebarGroup>
-  );
-};
+  )
+}

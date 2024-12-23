@@ -12,7 +12,7 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Eye, EyeOff, TowerControl } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import customAxios from "@/api";
 import { useEffect, useState } from "react";
@@ -178,7 +178,7 @@ export const LoginPage = () => {
           </div>
         </div>
       </div>
-      <div className="relative  bg-muted lg:block">
+      <div className="relative bg-muted md:block lg:block sm:hidden">
         <img
           src="https://res.cloudinary.com/dmi8xdkrq/image/upload/v1734767446/DALL_E_2024-12-21_13.20.12_-_A_black-and-white_artistic_view_from_the_top_of_a_lighthouse_overlooking_a_dramatic_coastline_with_rocky_cliffs_and_rolling_waves._The_scene_includes_unlrwl.webp"
           alt="Image"

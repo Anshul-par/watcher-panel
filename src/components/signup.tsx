@@ -156,7 +156,7 @@ export const SignupPage = () => {
           </div>
         </div>
       </div>
-      <div className="relative  bg-muted lg:block">
+      <div className="relative bg-muted md:block lg:block sm:hidden">
         <img
           src="https://res.cloudinary.com/dmi8xdkrq/image/upload/v1734767447/DALL_E_2024-12-21_13.19.10_-_A_black-and-white_artistic_view_from_the_top_of_a_lighthouse_overlooking_a_dramatic_coastline_with_rocky_cliffs_and_rolling_waves._The_perspective_ca_o5q60a.webp"
           alt="Image"
