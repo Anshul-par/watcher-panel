@@ -1,13 +1,13 @@
-import { useForm, SubmitHandler } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useForm, SubmitHandler } from "react-hook-form"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/select"
 import {
   Card,
   CardContent,
@@ -15,10 +15,10 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
-import { Spinner } from "./ui/spinner";
-import useGetProjects from "@/data/query/useGetProjects";
+} from "@/components/ui/card"
+import { useNavigate } from "react-router-dom"
+import { Spinner } from "./ui/spinner"
+import useGetProjects from "@/data/query/useGetProjects"
 import {
   Form,
   FormControl,
@@ -27,8 +27,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form";
-import { JSONEditorModal } from "./json-preview";
+} from "./ui/form"
+import { JSONEditorModal } from "./json-preview"
 import {
   Dialog,
   DialogContent,
@@ -36,17 +36,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { useState } from "react";
-import { useUpdateUrl } from "@/data/mutation/useUpdateUrl";
-import { useDeleteUrl } from "@/data/mutation/useDeleteUrl";
-import { parseJSON } from "@/helper/parseJSON";
-import { ErrorMessage } from "./layout/errormessage";
+} from "@/components/ui/dialog"
+import { useState } from "react"
+import { useUpdateUrl } from "@/data/mutation/useUpdateUrl"
+import { useDeleteUrl } from "@/data/mutation/useDeleteUrl"
+import { parseJSON } from "@/helper/parseJSON"
+import { ErrorMessage } from "./layout/errormessage"
+import { ScrollArea } from "./ui/scroll-area"
 
 interface DeleteModalProps {
-  isOpen: boolean;
-  setIsOpen: (boolean) => void;
-  onDelete: () => void;
+  isOpen: boolean
+  setIsOpen: (boolean) => void
+  onDelete: () => void
 }
 
 export const DeleteModal = ({
@@ -55,9 +56,9 @@ export const DeleteModal = ({
   onDelete,
 }: DeleteModalProps) => {
   const handleDelete = () => {
-    onDelete();
-    setIsOpen(false);
-  };
+    onDelete()
+    setIsOpen(false)
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -78,38 +79,38 @@ export const DeleteModal = ({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
 type FormInputs = {
-  _id: string;
-  name: string;
-  url: string;
-  urlWithIpPort: string;
-  cronSchedule: number;
-  timeout: number;
-  method: string;
-  project: any;
-  createdAt?: string;
-  updatedAt?: string;
-  body?: string;
-  headers?: string;
-};
+  _id: string
+  name: string
+  url: string
+  urlWithIpPort: string
+  cronSchedule: number
+  timeout: number
+  method: string
+  project: any
+  createdAt?: string
+  updatedAt?: string
+  body?: string
+  headers?: string
+}
 
 export const UpdateDetailsForm = ({
   initialData,
 }: {
-  initialData: FormInputs;
+  initialData: FormInputs
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false)
+  const navigate = useNavigate()
   const {
     data: projects,
     isLoading: projectsLoading,
     isError: projectsError,
-  } = useGetProjects();
-  const { mutate: deleteMutateUrl } = useDeleteUrl();
-  const { mutate: updateMutateUrl } = useUpdateUrl();
+  } = useGetProjects()
+  const { mutate: deleteMutateUrl } = useDeleteUrl()
+  const { mutate: updateMutateUrl } = useUpdateUrl()
   const form = useForm<FormInputs>({
     values: {
       ...initialData,
@@ -117,7 +118,7 @@ export const UpdateDetailsForm = ({
       body: JSON.stringify(initialData.body || {}, null, 2),
       headers: JSON.stringify(initialData.headers || {}, null, 2),
     },
-  });
+  })
 
   const onDelete = () => {
     //@ts-ignore
@@ -126,16 +127,16 @@ export const UpdateDetailsForm = ({
       {
         onSuccess: () => navigate("/"),
       }
-    );
-  };
+    )
+  }
 
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
-    const { _id, ...rest } = data;
+    const { _id, ...rest } = data
 
-    delete rest.createdAt;
-    delete rest.updatedAt;
+    delete rest.createdAt
+    delete rest.updatedAt
     //@ts-ignore
-    delete rest.__v;
+    delete rest.__v
 
     //@ts-ignore
     updateMutateUrl(
@@ -156,17 +157,17 @@ export const UpdateDetailsForm = ({
             message: e.response.data.message,
           }),
       }
-    );
-  };
+    )
+  }
 
-  let projectsListJSX = <></>;
+  let projectsListJSX = <></>
 
   if (projectsError) {
     projectsListJSX = (
       <div className="text-center text-red-500 text-sm">
         <ErrorMessage />
       </div>
-    );
+    )
   }
 
   if (projectsLoading) {
@@ -174,7 +175,7 @@ export const UpdateDetailsForm = ({
       <div className="flex justify-center items-center h-96">
         <Spinner size="sm" className="bg-black" />
       </div>
-    );
+    )
   }
 
   if (projects?.data) {
@@ -190,12 +191,12 @@ export const UpdateDetailsForm = ({
           </SelectItem>
         ))}
       </SelectContent>
-    );
+    )
   }
 
   return (
-    <>
-      <Card className="w-full h-screen overflow-y-auto">
+    <ScrollArea>
+      <Card className="w-full h-screen">
         <CardHeader>
           <CardTitle>URL Details</CardTitle>
           <CardDescription>
@@ -206,8 +207,8 @@ export const UpdateDetailsForm = ({
           <Form {...form}>
             <form
               onSubmit={(e) => {
-                form.clearErrors();
-                form.handleSubmit(onSubmit)(e);
+                form.clearErrors()
+                form.handleSubmit(onSubmit)(e)
               }}
               className="flex flex-col justify-between h-full"
             >
@@ -392,6 +393,6 @@ export const UpdateDetailsForm = ({
         </CardContent>
       </Card>
       <DeleteModal isOpen={isOpen} setIsOpen={setIsOpen} onDelete={onDelete} />
-    </>
-  );
-};
+    </ScrollArea>
+  )
+}
