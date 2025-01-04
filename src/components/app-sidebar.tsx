@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Globe } from "lucide-react";
+import { BoltIcon, Globe } from "lucide-react";
 import { ProjectFolders } from "@/components/project-folders";
 import { UtilityOptions } from "@/components/utility-options";
 import { NavUser } from "@/components/nav-user";
@@ -18,6 +18,11 @@ const data = {
       name: "Add URL",
       url: "add/url",
       icon: Globe,
+    },
+    {
+      name: "Add Job",
+      url: "add/job",
+      icon: BoltIcon,
     },
   ],
 };

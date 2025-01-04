@@ -7,6 +7,7 @@ import { ProjectForm } from "./components/project-form";
 import { SignupPage } from "./components/signup";
 import { LoginPage } from "./components/login";
 import NotFound from "./components/layout/notfound";
+import { AddJobForm } from "./components/add-job";
 
 export function App() {
   return (
@@ -18,6 +19,7 @@ export function App() {
           <Route path="url/:id" element={<UrlDetails />} />
           <Route path="add/url" element={<AddUrlForm />} />
           <Route path="project" element={<ProjectForm />} />
+          <Route path="add/job" element={<AddJobForm />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
