@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -23,20 +23,14 @@ import { useForm } from "react-hook-form";
 import { Form, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Spinner } from "./ui/spinner";
 import { ErrorMessage } from "./layout/errormessage";
+import { useNavigate } from "react-router-dom";
+import { useCreateJob } from "@/data/mutation/useCreateJob";
 
 export const AddJobForm = () => {
   const [selectedProject, setSelectedProject] = useState<string>("");
   const [selectedUrl, setSelectedUrl] = useState<string>("");
-  const {
-    data: projects,
-    // isLoading: projectsLoading,
-    // isError: projectsError,
-  } = useGetProjects();
-  const {
-    data: urls,
-    // isLoading: urlLoading,
-    // isError: urlError,
-  } = useGetProjectUrls({
+  const { data: projects } = useGetProjects();
+  const { data: urls } = useGetProjectUrls({
     project: selectedProject,
   });
   const {
@@ -45,14 +39,45 @@ export const AddJobForm = () => {
     isError: isInProcessError,
   } = useGetUrl({ urlId: selectedUrl });
 
+  const navigate = useNavigate();
   const form = useForm({});
 
-  const handleSubmit = (data: any) => {
-    console.log("Submitted:", { ...data });
+  const { mutate: createMutateJob } = useCreateJob();
+
+  const handleSubmit = () => {
+    if (!selectedProject || !selectedUrl) {
+      form.setError("formError", {
+        message: "Please select a project and a URL",
+      });
+      return;
+    }
+    console.log("Submitted:", { selectedProject, selectedUrl });
+
+    createMutateJob(
+      {
+        data: {
+          project: selectedProject,
+          url: selectedUrl,
+        },
+      },
+      {
+        onError: (e) => {
+          //@ts-ignore
+          form.setError("formError", {
+            type: "custom",
+            //@ts-ignore
+            message: e.response.data.message,
+          });
+        },
+        onSuccess: () => {
+          navigate(-1);
+        },
+      }
+    );
   };
 
   return (
-    <Dialog open={true}>
+    <Dialog open={true} onOpenChange={() => navigate(-1)}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add Job on URL</DialogTitle>
@@ -150,7 +175,7 @@ export const AddJobForm = () => {
                         <FormLabel>Status: </FormLabel>
                         <Badge
                           variant="outline"
-                          className={`col-span-3 ${
+                          className={`col-span-3 cursor-pointer ${
                             isInProcess?.data?.[0]?.inProcess
                               ? "bg-green-100 text-green-800 hover:bg-green-100"
                               : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
